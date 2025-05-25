@@ -4,7 +4,7 @@ import React from 'react'
 
 const page = () => {
     return (
-        <div className='pt-28 '>
+        <div className='pt-28 px-4'>
             <div className='max-w-3xl mx-auto'>
                 <h1 className='text-4xl font-bold text-center mb-4'>Obviously, let interrogation begin!</h1>
                 <h2 className='text-lg font-semibold text-center mb-4'>( Frequently Asked Questions )</h2>

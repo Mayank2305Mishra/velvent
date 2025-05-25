@@ -333,17 +333,6 @@ const page = () => {
           </div>
         </div>
       </section>
-      <section id="faq" className="py-20 bg-background">
-            <div className="container mx-auto px-4">
-                <h1 className="text-3xl md:text-4xl font-bold mb-4">Got some questions ? Get them answered </h1>
-                <p className="text-muted-foreground text-lg">
-                    
-                </p>
-                <Link href="/faq" className="text-lg text-white link text-center rounded-lg">
-                    FAQ's
-                </Link>
-            </div>
-      </section>
       <footer className="bg-muted py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">

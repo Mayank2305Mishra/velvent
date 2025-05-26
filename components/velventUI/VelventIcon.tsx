@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import React from 'react'
 
-const velventIcon = ({height, width}: {height: any, width: any}) => {
+const VelventIcon = ({height, width}: {height: any, width: any}) => {
     return (
         <>
             <Image
@@ -14,4 +14,4 @@ const velventIcon = ({height, width}: {height: any, width: any}) => {
     )
 }
 
-export default velventIcon
+export default VelventIcon

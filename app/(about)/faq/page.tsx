@@ -2,6 +2,7 @@ import { Metadata, ResolvingMetadata } from 'next'
 import Link from 'next/link'
 import React from 'react'
 
+
 const page = () => {
     return (
         <div className='pt-28 px-4'>

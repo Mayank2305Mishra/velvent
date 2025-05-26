@@ -9,7 +9,7 @@ import { CalendarIcon, MapPinIcon, ArrowRightIcon } from "lucide-react"
 import Image from 'next/image'
 import { motion } from "framer-motion"
 import { Instagram, Facebook, Twitter } from "lucide-react"
-import velventIcon from "@/components/velventUI/velventIcon"
+import VelventIcon from "@/components/velventUI/VelventIcon"
 import { generateMetadata } from "@/app/DynamicMetaData"
 
 
@@ -338,7 +338,7 @@ const page = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <velventIcon  height={80} width={80} />
+                <VelventIcon  height={80} width={80} />
               </div>
               <p className="text-muted-foreground mb-4">
                 Bazaar of Unforeseen Art

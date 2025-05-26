@@ -1,0 +1,18 @@
+{faq.map((item, index) => (
+                        <div key={item.id} className="py-2">
+                            <Collapsible
+                                onOpenChange={setOpen}
+                                className="w-full"
+                            >
+                                <CollapsibleTrigger className="w-full bg-light-400 shadow-lg shadow-light-900 rounded-2xl p-2">
+                                    <div className='flex items-center justify-between'>
+                                        <p className='text-lg text-start font-medium'>{item.question}</p>
+                                        {open ? <ChevronUp className='h-8 w-8' /> : <ChevronDown className='h-8 w-8' />}
+                                    </div>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="p-2 text-start text-black bg-light-400 rounded-b-2xl rounded-t-md shadow-lg shadow-light-900">
+                                    <p className='font-medium py-1.5'>{item.answer}</p>
+                                </CollapsibleContent>
+                            </Collapsible>
+                        </div>
+                    ))}

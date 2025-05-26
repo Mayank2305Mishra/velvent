@@ -20,7 +20,7 @@ const page = () => {
           <h2 className="text-xl font-semibold text-velvent">Ways to Connect</h2>
           <div className="flex flex-col md:px-32 justify-center gap-4 mt-4">
             <Link
-              href="mailto:velventart@gmail.com"
+              href="mailto:velventbazaar@gmail.com"
               className="bg-velvent text-lg text-white px-6 py-3 rounded-lg font-medium hover:bg-velvent/60 flex flex-row text-center items-center justify-center gap-4 transition"
             >
               <MailIcon className='h-5 w-5'/> Message Us
@@ -43,7 +43,7 @@ const page = () => {
         </section>
 
         <div className="mt-16 text-center text-sm text-[#5c2a75]">
-          <p>Email us at <a href="mailto:velventart@gmail.com" className="underline">velventart@gmail.com</a></p>
+          <p>Email us at <a href="mailto:velventbazaar@gmail.com" className="underline">velventbazaar@gmail.com</a></p>
           <p className="mt-2">velvent &copy; {new Date().getFullYear()}</p>
         </div>
       </div>

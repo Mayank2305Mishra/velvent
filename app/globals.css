@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Artifika&display=swap');
 @import "tailwindcss";
 
 
@@ -17,13 +18,20 @@
 
 body {
   background-color: var(--background);
-  font-family: 'Baloo2', sans-serif;
+  font-family: 'Montserrat', 'Artifika', sans-serif;
 }
 
 @layer base {
   @font-face {
-    font-family: 'Baloo2';
-    src: url('/fonts/Baloo2-VariableFont_wght.ttf') format('truetype');
+    font-family: 'Artifika';
+    src: url('/fonts/Artifika-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Montserrat';
+    src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
     font-weight: normal;
     font-display: swap;
   }
@@ -146,4 +154,10 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+.artifika-regular {
+  font-family: "Artifika", serif;
+  font-style: normal;
 }

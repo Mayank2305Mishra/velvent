@@ -10,7 +10,8 @@ import Image from 'next/image'
 import { motion } from "framer-motion"
 import { Instagram, Facebook, Twitter } from "lucide-react"
 import VelventIcon from "@/components/velventUI/VelventIcon"
-import { generateMetadata } from "@/app/DynamicMetaData"
+import { useRouter } from "next/navigation"
+import PWAInstallButton from "@/components/velventUI/PWAInstallButton"
 
 
 const artworks = [
@@ -94,6 +95,7 @@ const artists = [
 const page = () => {
   const [scrollY, setScrollY] = useState(0)
   const [hoveredId, setHoveredId] = useState<number | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -112,44 +114,45 @@ const page = () => {
   }
 
   return (
-    <div>
+    <div className=" artifika-regular  ">
       <section className="relative w-full h-screen overflow-hidden">
         {/* Background Image with Parallax */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1549366970-4efc91d3af9f?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-            filter: "brightness(1)"
           }}
         />
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-light-500/5" />
-        <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-start">
+        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-light-500/5" />
+        <div className="relative container mx-auto px-4 h-full flex flex-col justify-center text-center  items-center">
           {/* Main Content */}
-          <div className="max-w-3xl">
+          <div className="max-w-3xl ">
             <h1
               className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 leading-tight"
               style={{
                 textShadow: "0 2px 20px rgba(0,0,0,0.2)"
               }}
             >
-              BAZAAR OF <span className="text-transparent bg-clip-text bg-gradient-to-t  from-purple-400  via-purple-500  to-velvent">UNFORESEEN ART</span>
+              BAZAAR OF <span className="text-transparent bg-clip-text bg-gradient-to-t  from-velvent/35 to-velvent">UNFORESEEN ART</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-black mb-8 max-w-2xl">
+            <p className="text-lg md:text-xl  text-white mb-8 max-w-2xl">
               Discover extraordinary art collections and exhibitions curated for the modern art enthusiast. Experience creative expression in its most captivating forms.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col md:items-center md:justify-center sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="bg-velvent  text-lg  text-white hover:bg-black/90 transition-all"
+                className="bg-velvent text-lg  text-white hover:bg-black/90 transition-all"
+                onClick={() => router.push("/auth/artist")}
               >
                 Join As Artist
               </Button>
               <Button
                 size="lg"
-                className="text-lg  border-1 border-velvent/55 bg-velvent/40 text-white hover:bg-white/10 transition-all"
+                className="text-lg  border-1 border-velvent/75 bg-velvent/40 text-white hover:bg-white/10 transition-all backdrop-blur-lg"
+                onClick={() => router.push("/auth/user")}
               >
                 Explore Art
               </Button>
@@ -324,7 +327,7 @@ const page = () => {
                     {artist.bio}
                   </p>
 
-                  <Button  className="w-full text-lg text-white bg-velvent/60 ">
+                  <Button className="w-full text-lg text-white bg-velvent/60 ">
                     View Portfolio
                   </Button>
                 </div>
@@ -333,12 +336,13 @@ const page = () => {
           </div>
         </div>
       </section>
+      <PWAInstallButton />
       <footer className="bg-muted py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <VelventIcon  height={80} width={80} />
+                <VelventIcon height={80} width={80} />
               </div>
               <p className="text-muted-foreground mb-4">
                 Bazaar of Unforeseen Art
@@ -393,7 +397,7 @@ const page = () => {
             <div>
               <h3 className="font-semibold mb-4">Contact</h3>
               <ul className="space-y-2 text-muted-foreground">
-                <li>General: velventart@gmail.com</li>
+                <li>General: velventbazaar@gmail.com</li>
                 <li>Phone: +91 98********</li>
               </ul>
             </div>

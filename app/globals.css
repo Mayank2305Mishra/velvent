@@ -12,7 +12,7 @@
   --color-light-700: #c3bd9c;
   --color-light-800: #c3bd9c;
   --color-light-900: #b6af8b;
-  --color-valvent: #A31B98;
+  --color-velvent: #A31B98;
 }
 
 body {
@@ -56,7 +56,7 @@ body {
   }
 
   .nav-link {
-    @apply text-base border-b-1 border-valvent hover:border-transparent hover:text-valvent md:text-lg font-medium;
+    @apply text-base border-b-1 border-velvent hover:border-transparent hover:text-velvent md:text-lg font-medium;
   }
 
   .flex-between {

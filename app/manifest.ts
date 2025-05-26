@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
  
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Valvent",
-    short_name: "Valvent",
+    name: "velvent",
+    short_name: "velvent",
     description: "BAZAAR OF UNFORESEEN ART",
     start_url: '/',
     dir: "auto",

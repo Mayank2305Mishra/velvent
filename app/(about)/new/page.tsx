@@ -9,7 +9,7 @@ import { CalendarIcon, MapPinIcon, ArrowRightIcon } from "lucide-react"
 import Image from 'next/image'
 import { motion } from "framer-motion"
 import { Instagram, Facebook, Twitter } from "lucide-react"
-import ValventIcon from "@/components/velventUI/ValventIcon"
+import velventIcon from "@/components/velventUI/velventIcon"
 import { generateMetadata } from "@/app/DynamicMetaData"
 
 
@@ -133,7 +133,7 @@ const page = () => {
                 textShadow: "0 2px 20px rgba(0,0,0,0.2)"
               }}
             >
-              BAZAAR OF <span className="text-transparent bg-clip-text bg-gradient-to-t  from-purple-400  via-purple-500  to-valvent">UNFORESEEN ART</span>
+              BAZAAR OF <span className="text-transparent bg-clip-text bg-gradient-to-t  from-purple-400  via-purple-500  to-velvent">UNFORESEEN ART</span>
             </h1>
 
             <p className="text-lg md:text-xl text-black mb-8 max-w-2xl">
@@ -143,13 +143,13 @@ const page = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="bg-valvent  text-lg  text-white hover:bg-black/90 transition-all"
+                className="bg-velvent  text-lg  text-white hover:bg-black/90 transition-all"
               >
                 Join As Artist
               </Button>
               <Button
                 size="lg"
-                className="text-lg  border-1 border-valvent/55 bg-valvent/40 text-white hover:bg-white/10 transition-all"
+                className="text-lg  border-1 border-velvent/55 bg-velvent/40 text-white hover:bg-white/10 transition-all"
               >
                 Explore Art
               </Button>
@@ -247,7 +247,7 @@ const page = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="p-6 md:p-8 flex bg-valvent/40 backdrop-blur-3xl text-white flex-col md:flex-row gap-6 items-start">
+                <div className="p-6 md:p-8 flex bg-velvent/40 backdrop-blur-3xl text-white flex-col md:flex-row gap-6 items-start">
                   <div className="md:w-3/4">
                     {exhibition.featured && (
                       <div className="inline-block px-3 py-1 bg-primary/10 text-xs rounded-full mb-4 text-white">
@@ -324,7 +324,7 @@ const page = () => {
                     {artist.bio}
                   </p>
 
-                  <Button  className="w-full text-lg text-white bg-valvent/60 ">
+                  <Button  className="w-full text-lg text-white bg-velvent/60 ">
                     View Portfolio
                   </Button>
                 </div>
@@ -338,7 +338,7 @@ const page = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <ValventIcon  height={80} width={80} />
+                <velventIcon  height={80} width={80} />
               </div>
               <p className="text-muted-foreground mb-4">
                 Bazaar of Unforeseen Art
@@ -393,7 +393,7 @@ const page = () => {
             <div>
               <h3 className="font-semibold mb-4">Contact</h3>
               <ul className="space-y-2 text-muted-foreground">
-                <li>General: valventart@gmail.com</li>
+                <li>General: velventart@gmail.com</li>
                 <li>Phone: +91 98********</li>
               </ul>
             </div>
@@ -401,7 +401,7 @@ const page = () => {
 
           <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Valvent. All rights reserved.
+              © {new Date().getFullYear()} velvent. All rights reserved.
             </p>
 
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">

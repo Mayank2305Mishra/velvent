@@ -11,11 +11,11 @@ const page = () => {
         <div className=' mx-auto flex size-full pt-240 md:pt-200 justify-center items-center flex-col max-w-[496px]'>
           <div className="text-center mb-12 ">
             <h1 className="text-4xl font-extrabold tracking-tight mb-2">
-              About <span className="text-valvent">Valvent</span>
+              About <span className="text-velvent">velvent</span>
             </h1>
           </div>
           <div className="space-y-6">
-            {/* About Valvent */}
+            {/* About velvent */}
             <div>
               <h2 className="text-2xl font-semibold text-black mb-4">Who We Are</h2>
               <p className="text-gray-800 text-lg leading-relaxed">
@@ -74,7 +74,7 @@ export async function generateMetadata(
   parent: ResolvingMetadata 
 ): Promise<Metadata> {
   return {
-    title: "About | Valvent",
+    title: "About | velvent",
   }
 }
 

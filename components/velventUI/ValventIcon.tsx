@@ -1,12 +1,12 @@
 import Image from 'next/image'
 import React from 'react'
 
-const ValventIcon = ({height, width}: {height: any, width: any}) => {
+const velventIcon = ({height, width}: {height: any, width: any}) => {
     return (
         <>
             <Image
                 src="/logo_text.png"
-                alt='valvent logo'
+                alt='velvent logo'
                 width={width}
                 height={height}
             />
@@ -14,4 +14,4 @@ const ValventIcon = ({height, width}: {height: any, width: any}) => {
     )
 }
 
-export default ValventIcon
+export default velventIcon

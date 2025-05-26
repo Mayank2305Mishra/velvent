@@ -4,7 +4,7 @@ export async function generateMetadata(
   title: string
 ): Promise<Metadata> {
   return {
-    title: `${title} | Valvent`,
+    title: `${title} | velvent`,
     description: "Bazaar of Unforeseen Art",
     icons: {
       icon: "/logo.png",

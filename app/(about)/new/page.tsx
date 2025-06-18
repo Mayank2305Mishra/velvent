@@ -11,8 +11,6 @@ import { motion } from "framer-motion"
 import { Instagram, Facebook, Twitter } from "lucide-react"
 import VelventIcon from "@/components/velventUI/VelventIcon"
 import { useRouter } from "next/navigation"
-import PWAInstallButton from "@/components/velventUI/PWAInstallButton"
-
 
 const artworks = [
   {
@@ -145,7 +143,7 @@ const page = () => {
               <Button
                 size="lg"
                 className="bg-velvent text-lg  text-white hover:bg-black/90 transition-all"
-                onClick={() => router.push("/auth/artist")}
+                onClick={() => router.push("/auth/artist/login")}
               >
                 Join As Artist
               </Button>
@@ -335,10 +333,6 @@ const page = () => {
             ))}
           </div>
         </div>
-      </section>
-      <section className="py-20 bg-background">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">Add Velvent to Home Screen</h1>
-        <PWAInstallButton />
       </section>
       <footer className="bg-muted py-12 md:py-16">
         <div className="container mx-auto px-4">

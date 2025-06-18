@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner"
 import type { Metadata } from "next";
 import { Artifika, Montserrat } from "next/font/google";
 import "./globals.css";
@@ -33,6 +34,7 @@ export default function RootLayout({
         className={`${montserrat.variable} ${artifika.variable} antialiased`}
       >
         {children}
+        <Toaster/>
       </body>
     </html>
   );

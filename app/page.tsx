@@ -1,15 +1,9 @@
-"use client"
+import { getLoggedInUser } from '@/lib/actions/user.action'
 import React from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
-const page = () => {
-  const router = useRouter()
-  const [login, setLogin] = useState(false)
-  if (!login) {
-    router.push('/new')
-  }
+const page = async () => {
+  const user = await getLoggedInUser()
+  console.log(user);
   return (
     <div>
     </div>

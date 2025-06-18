@@ -2,15 +2,15 @@ import type { MetadataRoute } from 'next'
  
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "velvent",
-    short_name: "velvent",
+    name: "Velvent",
+    short_name: "Velvent",
     description: "BAZAAR OF UNFORESEEN ART",
     start_url: '/',
     dir: "auto",
     orientation: "any",
     lang: "en-GB",
     display: 'standalone',
-    theme_color: "#671b98",
+    theme_color: "#00FFFFFF",
     background_color: "#cac4a6",
     icons: [
       {

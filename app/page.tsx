@@ -1,11 +1,14 @@
-import { getLoggedInUser } from '@/lib/actions/user.action'
+"use client"
+import Home from '@/components/velventUI/Home'
 import React from 'react'
+import { useAuthStore } from './store'
 
-const page = async () => {
-  const user = await getLoggedInUser()
-  console.log(user);
+const page = () => {
+  const { user } = useAuthStore()
+
   return (
     <div>
+      {user?.name}
     </div>
   )
 }

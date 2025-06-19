@@ -34,17 +34,17 @@ const page = () => {
     setIsLoading(true);
     const {email, password} = data;
     try {
-      if(activeTab === 'email'){
-        const response = await user_login({email,password})
-        if(response){
-          toast.success(`You have logined sucessfullly with email ${email}`)
-          route.push('/')
-        }
-        if(!response){
+      const response = await user_login({email,password})
+      console.log(response);
+      
+      if(response){
+        toast.success(`You have logined sucessfullly with email ${email}`)
+        route.push('/')
+      }
+      if(!response){
           toast.error(`Error in login with email ${email}`)
 
         }
-      }
     } catch (error) {
       console.error('ERROR', error)
     }finally{

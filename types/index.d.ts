@@ -23,3 +23,15 @@ declare type UserLoginParams = {
     email: string;
     password: string;
 };
+
+declare type User = {
+    userId: string;
+    dob: Date;
+    gender: string;
+    bannerImg: string;
+    name: string;
+    email: string;
+    avatar: string;
+    bio: string;
+    phone: string;
+}

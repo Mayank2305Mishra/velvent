@@ -47,6 +47,7 @@ const page = () => {
         dob: new Date(data.dob),
       })
       console.log(response)
+      if(response) route.push('/')
     } catch (error) {
      console.error('ERROR',error) 
     }finally{

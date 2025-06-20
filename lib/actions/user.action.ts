@@ -1,4 +1,4 @@
-import { ID, Query } from "appwrite";
+import { ID, Query, OAuthProvider } from "appwrite";
 import { account, avatars, databases } from "../appwrite";
 
 export const user_signUp = async ({ password, ...userData }: UserSignUpParams) => {
@@ -45,14 +45,45 @@ export async function getAccount() {
     }
 }
 
+const getGooglePicture = async (accessToken: string) => {
+    try {
+        const response = await fetch(
+            "https://people.googleapis.com/v1/people/me?personFields=photos",
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        if (!response.ok) throw new Error("Failed to fetch Google profile picture");
+
+        const { photos } = await response.json();
+        return photos?.[0]?.url || null;
+    } catch (error) {
+        console.error("Error fetching Google picture:", error);
+        return null;
+    }
+};
+
+export async function googleLogin() {
+    try {
+        const session = await account.createOAuth2Session(
+            OAuthProvider.Google,
+            `${window.location.origin}/`,
+            `${window.location.origin}/404`
+        )
+        return session;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+
 export async function getCurrentAccount() {
     try {
         const currentAccount = await getAccount()
         if (!currentAccount) throw Error;
 
         const currentUser = await databases.listDocuments(
-            process.env.NEXT_PUBLIC_DATABASE!,
-            process.env.NEXT_PUBLIC_USER_COLLECTION!,
+            process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+            process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
             [Query.equal("userId", currentAccount.$id)]
         );
         if (!currentUser) throw Error;

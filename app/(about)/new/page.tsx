@@ -150,7 +150,7 @@ const page = () => {
               <Button
                 size="lg"
                 className="text-lg  border-1 border-velvent/75 bg-velvent/40 text-white hover:bg-white/10 transition-all backdrop-blur-lg"
-                onClick={() => router.push("/auth/user")}
+                onClick={() => router.push("/auth/user/signup")}
               >
                 Explore Art
               </Button>

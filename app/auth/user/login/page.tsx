@@ -213,7 +213,7 @@ const page = () => {
         <div className="text-center">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <Link href="/auth/signup" className="text-black font-medium hover:underline">
+            <Link href="/auth/user/signup" className="text-black font-medium hover:underline">
               Create one
             </Link>
           </p>

@@ -1,6 +1,8 @@
+
 import { create } from 'zustand'
 import { getCurrentAccount } from '@/lib/actions/user.action';
 import { persist } from "zustand/middleware";
+
 
 export const INITIAL_USER = {
     userId: "",
@@ -60,7 +62,6 @@ export const useAuthStore = create<AuthStore>()(
                     return false;
                 }
             },
-
             logout: async () => {
                 set(() => ({ user: INITIAL_USER, isAuthenticated: false }));
             },

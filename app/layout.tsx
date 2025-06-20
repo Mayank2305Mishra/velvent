@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner"
 import type { Metadata } from "next";
 import { Artifika, Montserrat } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
 
 const artifika = Artifika({
   variable: "--font-artifika",
@@ -30,12 +31,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <AuthProvider>
       <body
         className={`${montserrat.variable} ${artifika.variable} antialiased`}
       >
         {children}
         <Toaster/>
       </body>
+      </AuthProvider>
     </html>
   );
 }

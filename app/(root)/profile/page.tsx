@@ -21,6 +21,8 @@ const page = () => {
           className="object-cover object-center rounded-2xl"
           priority
         />
+
+        <h1>{user?.name}</h1>
       </div>
     </div>
   )

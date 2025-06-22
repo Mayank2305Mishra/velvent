@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true
   },
   images: {
-    domains: ['images.unsplash.com','images.pexels.com','plus.unsplash.com','as2.ftcdn.net','i.ibb.co']
+    domains: ['images.unsplash.com','images.pexels.com','plus.unsplash.com','as2.ftcdn.net','i.ibb.co',"cloud.appwrite.io","api.dicebear.com"]
   }
 };
 

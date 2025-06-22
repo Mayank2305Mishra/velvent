@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { useAuthStore } from '../store'
+import { useAuthStore } from '../../store'
 import Image from 'next/image'
 import {
   Avatar,
@@ -18,7 +18,7 @@ const page = () => {
           src={user?.bannerImg} // ✅ Make sure this file exists in the /public folder
           alt="Banner"
           fill
-          className="object-cover object-center"
+          className="object-cover object-center rounded-2xl"
           priority
         />
       </div>

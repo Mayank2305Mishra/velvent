@@ -5,10 +5,8 @@ import Link from 'next/link';
 const page = () => {
   const {user} = useAuthStore()
   return (
-    <div className='text-xl h-screen flex flex-col text-center items-center justify-center'>
-      <h1>{user?.name}</h1>
-      <img src={user?.avatar} alt="img" />
-      <Link href='/profile'>Profile page</Link>
+    <div className=''>
+      <h1>You have been successfully logged in as {user?.name} , with email id {user?.email}</h1>
     </div>
   )
 }

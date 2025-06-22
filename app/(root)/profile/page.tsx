@@ -13,7 +13,7 @@ const page = () => {
   return (
     <div className='flex flex-row justify-center w-full'>
       {/* Background image */}
-      <div className="relative w-full h-[28vh] lg:h-[35vh]">
+      <div className="relative w-full h-[18vh] lg:h-[35vh]">
         <Image
           src={user?.bannerImg} // ✅ Make sure this file exists in the /public folder
           alt="Banner"

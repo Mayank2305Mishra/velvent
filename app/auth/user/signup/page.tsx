@@ -18,7 +18,7 @@ import { z } from 'zod';
 import { FaGoogle } from "react-icons/fa6";
 import { userSignupSchema } from '@/lib/validation';
 import { useRouter } from 'next/navigation';
-import { user_signUp } from '@/lib/actions/user.action';
+import { googleLogin, user_signUp } from '@/lib/actions/user.action';
 
 
 const page = () => {
@@ -54,9 +54,11 @@ const page = () => {
       setloading(false)
     }
   };
-  const handleGoogleSignUp = () => {
+  const handleGoogleSignUp = async() => {
     console.log('Google sign up clicked');
-    // Implement Google OAuth
+    const user = await googleLogin()
+    console.log(user);
+    
   };
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

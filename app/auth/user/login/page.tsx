@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail, Phone, Lock } from 'lucide-react';
 import { FaGoogle } from 'react-icons/fa6';
-import { user_login } from '@/lib/actions/user.action';
+import { googleLogin, user_login } from '@/lib/actions/user.action';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
@@ -58,6 +58,8 @@ const page = () => {
 
   const handleGoogleLogin = () => {
     console.log('Google login clicked');
+    const user = googleLogin();
+    console.log(user);
   };
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

@@ -58,7 +58,7 @@ const Sidebar = ({ user }: {user : User}) => {
         </div>
 
         {/* Profile Section */}
-        <div className="absolute bottom-6 left-6 right-6">
+        <Link href="/profile" className="absolute bottom-6 left-6 right-6">
           <div className={cn(
             "flex items-center p-4 rounded-2xl bg-white/5 border border-white/10",
             "hover:bg-white/10 cursor-pointer ultra-smooth",
@@ -76,7 +76,7 @@ const Sidebar = ({ user }: {user : User}) => {
               <p className="text-gray-900 text-xs whitespace-nowrap">{user?.email}</p>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   )

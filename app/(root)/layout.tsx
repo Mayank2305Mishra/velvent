@@ -31,7 +31,7 @@ export default function RootLayout({
                 {/* Sidebar for Large Devices Only */}
                 <Sidebar user={user} />
                 <main className={cn(
-                    "butter-smooth pt-32 pb-24 lg:pb-12 px-6",
+                    "butter-smooth pt-32 pb-24 lg:pb-12 px-0.5 md:px-2.5 lg:px-4",
                     sidebarCollapsed ? "lg:ml-28" : "lg:ml-80"
                 )}>
                     <div className="max-w-6xl mx-auto">

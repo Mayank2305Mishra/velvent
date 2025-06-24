@@ -1,4 +1,5 @@
-import { Home, Settings, Users } from "lucide-react";
+import { Home, Settings, ShoppingBag } from "lucide-react";
+
 
 export const navItems = [
     {
@@ -7,9 +8,9 @@ export const navItems = [
       icon: Home
     },
     {
-        route:'/profile',
-        label:'Profile',
-        icon:Users
+        route:'/cart',
+        label:'Cart',
+        icon: ShoppingBag
     },
     {
         route:'/settings',

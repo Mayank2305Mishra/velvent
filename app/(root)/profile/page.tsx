@@ -44,7 +44,10 @@ const page = () => {
       {/* Username + Edit Button (for mobile) */}
       <div className="flex justify-between items-center mt-20 sm:mt-18 px-4 sm:px-8">
         <h1 className="text-xl sm:text-2xl font-semibold text-velvent">
-          {user?.name}
+          <div>
+            <h1>{user?.name}</h1>
+            <h2 className="text-[10px] sm:text-lg text-black ">{user?.email}</h2>
+          </div>
         </h1>
 
         {/* Edit Button visible only on mobile */}

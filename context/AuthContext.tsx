@@ -71,7 +71,7 @@ export const AuthProvider  = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         checkAuthUser();
         const cookieFallback = localStorage.getItem("cookieFallback");
-        if (cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) { route.push("/new"); }
+        if (cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) {  }
     }, [])
     
     const values = {

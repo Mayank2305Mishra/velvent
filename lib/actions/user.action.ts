@@ -1,5 +1,6 @@
 import { ID, Query, OAuthProvider } from "appwrite";
 import { account, avatars, databases } from "../appwrite";
+import { create } from "domain";
 
 export const user_signUp = async ({ password, ...userData }: UserSignUpParams) => {
     const { email, name } = userData;
@@ -66,15 +67,45 @@ export async function googleLogin() {
         const session = await account.createOAuth2Session(
             OAuthProvider.Google,
             `${window.location.origin}/`,
-            `${window.location.origin}/profile`,  
-            )
+            `${window.location.origin}/`,
+        )
         return session;
     } catch (error) {
         console.error(error);
     }
 }
 
+export async function signupWithGoogleOAuth() {
+    try {
+        const session = await account.createOAuth2Session(
+            OAuthProvider.Google,
+            `${window.location.origin}/profile/edit`,
+            `${window.location.origin}/login`,
+        );
+        const user = await account.get();
+        if (!user) throw new Error("User not found");
 
+        const { providerAccessToken } = (await account.getSession("current")) || {};
+        const profilePicture = providerAccessToken
+            ? await getGooglePicture(providerAccessToken)
+            : null;
+        const createdUser = await databases.createDocument(
+            process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+            process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+            ID.unique(),
+            {
+                userId: user.$id,
+                email: user.email,
+                name: user.name,
+                avatar: profilePicture,
+            }
+        );
+        return createdUser;
+    } catch (err) {
+        console.error('Signup Error:', err);
+        throw err;
+    }
+}
 
 export async function getCurrentAccount() {
     try {

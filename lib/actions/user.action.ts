@@ -77,11 +77,9 @@ export async function googleLogin() {
 
 export async function signupWithGoogleOAuth() {
     try {
-        const session = await account.createOAuth2Session(
-            OAuthProvider.Google,
-            `${window.location.origin}/profile/edit`,
-            `${window.location.origin}/login`,
-        );
+        const session = await googleLogin();
+        if(!session) throw new Error("Session not found");
+        
         const user = await account.get();
         if (!user) throw new Error("User not found");
 

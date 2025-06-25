@@ -67,26 +67,46 @@ export async function googleLogin() {
         await account.createOAuth2Session(
             OAuthProvider.Google,
             `${window.location.origin}/`,
-            `${window.location.origin}/`,
+            `${window.location.origin}/login`,
         )
-        const session = await account.getSession("current");
+        //const session = await account.getSession("current");
         const user = await account.get();
-        return {session, user};
+        console.log(user.email);
+        return user;
     } catch (error) {
         console.error(error);
     }
 }
 
-export async function signupWithGoogleOAuth() {
+export async function storeGoogleUser(email: string) {
     try {
-        await account.createOAuth2Session(
-            OAuthProvider.Google,
-            `${window.location.origin}/auth/user/signup`,
-            `${window.location.origin}/`,
-        )
-        const session = await account.getSession("current");
-        const user = await account.get();
-        return {session, user};
+        const userData = await databases.listDocuments(
+            process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+            process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+            [Query.equal("email", email)]
+        );
+        if (userData.total == 0) {
+            const user = await getAccount()
+            if(!user) throw Error("User not found");
+            const { providerAccessToken } = (await account.getSession("current")) || {};
+            const profilePicture = providerAccessToken
+                ? await getGooglePicture(providerAccessToken)
+                : null;
+
+            const newUser = await databases.createDocument(
+                process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+                process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+                ID.unique(),
+                {
+                    email: user.email,
+                    userId: user.$id,
+                    avatar: profilePicture,
+                    name: user.name,
+
+                }
+            )
+            return newUser;
+        }
     } catch (err) {
         console.error('Signup Error:', err);
         throw err;

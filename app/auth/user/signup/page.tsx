@@ -17,7 +17,7 @@ import { z } from 'zod';
 import { FaGoogle } from "react-icons/fa6";
 import { userSignupSchema } from '@/lib/validation';
 import { useRouter } from 'next/navigation';
-import {  signupWithGoogleOAuth, user_signUp } from '@/lib/actions/user.action';
+import {  getAccount, googleLogin, storeGoogleUser, user_signUp } from '@/lib/actions/user.action';
 
 
 const page = () => {
@@ -55,9 +55,10 @@ const page = () => {
   };
   const handleGoogleSignUp = async() => {
     console.log('Google sign up clicked');
-    const user = await signupWithGoogleOAuth()
-    console.log(user);
-    
+    await googleLogin();
+    const user = await getAccount()
+    if(!user) throw Error("User not found");
+    await storeGoogleUser(user.email)
   };
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

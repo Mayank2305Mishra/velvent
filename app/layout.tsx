@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Artifika, Montserrat } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { getAccount, storeGoogleUser } from "@/lib/actions/user.action";
 
 const artifika = Artifika({
   variable: "--font-artifika",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

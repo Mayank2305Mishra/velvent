@@ -1,6 +1,6 @@
 
 import { create } from 'zustand'
-import { getCurrentAccount } from '@/lib/actions/user.action';
+import { getAccount, getCurrentAccount, storeGoogleUser } from '@/lib/actions/user.action';
 import { persist } from "zustand/middleware";
 
 

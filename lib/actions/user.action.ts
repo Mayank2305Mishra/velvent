@@ -64,12 +64,14 @@ const getGooglePicture = async (accessToken: string) => {
 
 export async function googleLogin() {
     try {
-        const session = await account.createOAuth2Session(
+        await account.createOAuth2Session(
             OAuthProvider.Google,
             `${window.location.origin}/`,
             `${window.location.origin}/`,
         )
-        return session;
+        const session = await account.getSession("current");
+        const user = await account.get();
+        return {session, user};
     } catch (error) {
         console.error(error);
     }
@@ -77,28 +79,14 @@ export async function googleLogin() {
 
 export async function signupWithGoogleOAuth() {
     try {
-        const session = await googleLogin();
-        if(!session) throw new Error("Session not found");
-        
+        await account.createOAuth2Session(
+            OAuthProvider.Google,
+            `${window.location.origin}/auth/user/signup`,
+            `${window.location.origin}/`,
+        )
+        const session = await account.getSession("current");
         const user = await account.get();
-        if (!user) throw new Error("User not found");
-
-        const { providerAccessToken } = (await account.getSession("current")) || {};
-        const profilePicture = providerAccessToken
-            ? await getGooglePicture(providerAccessToken)
-            : null;
-        const createdUser = await databases.createDocument(
-            process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-            process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
-            ID.unique(),
-            {
-                userId: user.$id,
-                email: user.email,
-                name: user.name,
-                avatar: profilePicture,
-            }
-        );
-        return createdUser;
+        return {session, user};
     } catch (err) {
         console.error('Signup Error:', err);
         throw err;

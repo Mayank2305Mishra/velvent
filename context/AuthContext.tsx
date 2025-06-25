@@ -44,10 +44,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(true)
         try {
             const currentAccount = await getCurrentAccount()
-            const userGoogle = await getAccount();
-            if (userGoogle) {
-                storeGoogleUser(userGoogle.email);
-            }
             
             if (currentAccount) {
                 setUser({

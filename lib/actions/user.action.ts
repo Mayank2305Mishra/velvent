@@ -66,7 +66,7 @@ export async function googleLogin() {
     try {
         await account.createOAuth2Session(
             OAuthProvider.Google,
-            `${window.location.origin}/`,
+            `${window.location.origin}/profile/edit`,
             `${window.location.origin}/login`,
         )
         //const session = await account.getSession("current");

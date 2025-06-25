@@ -12,15 +12,13 @@ export default function RootLayout({
 }: {
     children: React.ReactNode
 }) {
-    const { checkAuthUser } = useAuthStore()
+    const { checkAuthUser, googleUserData } = useAuthStore()
     useEffect(() => {
         const userstate = checkAuthUser()
+        const data = googleUserData()
     })
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-    const toggleSidebar = () => {
-        setSidebarCollapsed(!sidebarCollapsed)
-    }
     const {user} = useAuthStore()
     return (
         <html lang="en">

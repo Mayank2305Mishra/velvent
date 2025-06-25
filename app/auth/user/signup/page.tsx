@@ -56,9 +56,6 @@ const page = () => {
   const handleGoogleSignUp = async() => {
     console.log('Google sign up clicked');
     await googleLogin();
-    const user = await getAccount()
-    if(!user) throw Error("User not found");
-    await storeGoogleUser(user.email)
   };
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

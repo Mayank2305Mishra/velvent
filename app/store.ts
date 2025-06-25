@@ -25,6 +25,7 @@ interface AuthStore {
     isAuthenticated: boolean;
     setIsAuthenticated: (bool: boolean) => void;
     checkAuthUser: () => Promise<boolean>;
+    googleUserData: () => Promise<any>;
     logout: () => void;
 }
 
@@ -61,6 +62,22 @@ export const useAuthStore = create<AuthStore>()(
                     console.error(error);
                     return false;
                 }
+            },
+            googleUserData: async () => {
+              try {
+                  const user = await getAccount();
+                  if(user){
+                  const userData = await storeGoogleUser(user.email);
+                  return userData
+                  }
+                  else{
+                    return INITIAL_USER
+                  }
+              }  
+              catch (error) {
+               console.error(error)
+               throw error; 
+              }
             },
             logout: async () => {
                 set(() => ({ user: INITIAL_USER, isAuthenticated: false }));

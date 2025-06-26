@@ -117,11 +117,19 @@ async function getUserDOBGoogle(accessToken: string): Promise<string | null> {
       const dobData = primaryBirthday ? primaryBirthday.date : data.birthdays[0].date;
 
       if (dobData && dobData.year && dobData.month && dobData.day) {
-        // Format the date as DD/MM/YYYY
-        const day = dobData.day.toString().padStart(2, '0');
-        const month = dobData.month.toString().padStart(2, '0');
+        // Validate the year against the specified range
+        if (dobData.year < 1000 || dobData.year > 9999) {
+          console.error(`Invalid year received from API: ${dobData.year}. Year must be between 1000 and 9999.`);
+          return null;
+        }
+
+        // Format the date as YYYY-MM-DD HH:MM:SS
         const year = dobData.year.toString();
-        return `${day}/${month}/${year}`;
+        const month = dobData.month.toString().padStart(2, '0');
+        const day = dobData.day.toString().padStart(2, '0');
+        const time = "00:00:00"; // Time components are not provided by Google People API for birthdays
+
+        return `${year}-${month}-${day} ${time}`;
       } else {
         console.log('Birthday data found, but missing year, month, or day.');
         return null;

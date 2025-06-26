@@ -14,8 +14,8 @@ export default function RootLayout({
 }) {
     const { checkAuthUser, googleUserData } = useAuthStore()
     useEffect(() => {
-        const userstate = checkAuthUser()
         const data = googleUserData()
+        const userstate = checkAuthUser()
     })
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 

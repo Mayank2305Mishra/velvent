@@ -2,6 +2,7 @@
 import { create } from 'zustand'
 import { getAccount, getCurrentAccount, storeGoogleUser } from '@/lib/actions/user.action';
 import { persist } from "zustand/middleware";
+import { account } from '@/lib/appwrite';
 
 
 export const INITIAL_USER = {
@@ -65,7 +66,7 @@ export const useAuthStore = create<AuthStore>()(
             },
             googleUserData: async () => {
               try {
-                  const user = await getAccount();
+                  const user = await getAccount()
                   if(user){
                   const userData = await storeGoogleUser(user.email);
                   return userData

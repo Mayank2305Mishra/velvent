@@ -69,6 +69,7 @@ export const useAuthStore = create<AuthStore>()(
                   const user = await getAccount()
                   if(user){
                   const userData = await storeGoogleUser(user.email);
+                  await get().checkAuthUser();
                   return userData
                   }
                   else{

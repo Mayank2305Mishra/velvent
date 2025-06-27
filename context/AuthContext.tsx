@@ -68,13 +68,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setIsLoading(false)
         }
     }
-
-    useEffect(() => {
-        checkAuthUser();
-        const cookieFallback = localStorage.getItem("cookieFallback");
-        if (cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) { }
-    }, [])
-
     const values = {
         user,
         setUser,

@@ -6,18 +6,16 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FadeInStagger } from '@/components/velventUI/Animation';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Calendar, Mail, Phone, User, Lock, FileText, Users } from 'lucide-react';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Calendar, Mail, Phone, User, Lock, FileText, Users } from 'lucide-react';
 import { z } from 'zod';
 import { FaGoogle } from "react-icons/fa6";
 import { userSignupSchema } from '@/lib/validation';
 import { useRouter } from 'next/navigation';
-import {  getAccount, googleLogin, storeGoogleUser, user_signUp } from '@/lib/actions/user.action';
+import {  googleLogin, user_signUp } from '@/lib/actions/user.action';
 
 
 const page = () => {

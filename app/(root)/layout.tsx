@@ -14,15 +14,15 @@ export default function RootLayout({
 }) {
     const { checkAuthUser, googleUserData } = useAuthStore()
     useEffect(() => {
-        const data = googleUserData()
+       const data = googleUserData()
         const userstate = checkAuthUser()
     })
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
     const {user} = useAuthStore()
     return (
-        <html lang="en">
-            <body>
+        <html lang="en" suppressHydrationWarning>
+            <body suppressHydrationWarning >
                 {/* Navbar */}
                 <Navbar />
 

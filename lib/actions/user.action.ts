@@ -1,10 +1,10 @@
 import { ID, Query, OAuthProvider } from "appwrite";
 import { account, avatars, databases } from "../appwrite";
-
+import {users} from "./user.server";
 export const user_signUp = async ({ password, ...userData }: UserSignUpParams) => {
-    const { email, name } = userData;
+    const { email, name , phone} = userData;
     try {
-        const user = await account.create(ID.unique(), email, password, name);
+        const user = await users.create(ID.unique(), email, phone , password, name);
         if (!user) throw new Error("User not created");
         const avatar = await avatars.getInitials(name, 100, 100, "DFD3E3");
         await user_login({ email, password })
@@ -18,6 +18,7 @@ export const user_signUp = async ({ password, ...userData }: UserSignUpParams) =
                 userId: user.$id,
                 avatar,
                 dateOfJoin : today,
+                MethodOFAuth : "EP"
             }
         )
         return newUser;
@@ -250,7 +251,8 @@ export async function storeGoogleUser(email: string) {
                     name: user.name,
                     dob: dob,
                     phone: phone,
-                    dateOfJoin: today
+                    dateOfJoin: today,
+                    MethodOFAuth: "Google"
                 }
             )
             return newUser;
@@ -288,3 +290,22 @@ export async function signOut() {
         console.error(error);
     }
 }
+
+export function formatIndianPhoneNumber(phone: string): string {
+  // Remove all whitespace for safety
+  const cleaned = phone.trim().replace(/\s+/g, '');
+
+  // Check if it already starts with +91 and has 10 digits after it
+  if (/^\+91\d{10}$/.test(cleaned)) {
+    return cleaned;
+  }
+
+  // If it's just 10 digits without +91, append +91
+  if (/^\d{10}$/.test(cleaned)) {
+    return `+91${cleaned}`;
+  }
+
+  // If it's invalid, you can throw an error or handle it differently
+  throw new Error('Invalid phone number format. Expecting 10 digits or +91XXXXXXXXXX.');
+}
+

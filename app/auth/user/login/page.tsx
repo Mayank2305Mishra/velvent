@@ -15,6 +15,7 @@ import { FaGoogle } from 'react-icons/fa6';
 import { googleLogin, user_login } from '@/lib/actions/user.action';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { emailCheckLogin } from '@/lib/actions/toast.action';
 
 type LoginForm = user_LoginEmailForm | user_LoginPhoneForm;
 
@@ -34,6 +35,11 @@ const page = () => {
     setIsLoading(true);
     const {email, password} = data;
     try {
+      const checkEmail = await emailCheckLogin(email)
+      if(checkEmail){
+        toast.error(checkEmail)
+        route.push('/auth/user/signup')
+      }
       const response = await user_login({email,password})
       console.log(response);
       
@@ -42,8 +48,7 @@ const page = () => {
         route.push('/')
       }
       if(!response){
-          toast.error(`Error in login with email ${email}`)
-
+          toast.error(`Error in login with email ${email}, invalid credientials or email not registered`)
         }
     } catch (error) {
       console.error('ERROR', error)
@@ -52,8 +57,7 @@ const page = () => {
     }
   };
   const onSubmitPhone = async(data:user_LoginPhoneForm) =>{
-    console.log(data);
-    
+    console.log(data);    
   }
 
   const handleGoogleLogin = () => {
@@ -163,7 +167,7 @@ const page = () => {
                   <div className="space-y-2">
                     <Label htmlFor="phone" className="flex items-center gap-2 text-sm font-medium text-black">
                       <Phone className="w-4 h-4" />
-                      Phone Number
+                      Phone Number (+91)
                     </Label>
                     <Input
                       id="phone"

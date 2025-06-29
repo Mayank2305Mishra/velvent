@@ -15,8 +15,9 @@ import { z } from 'zod';
 import { FaGoogle } from "react-icons/fa6";
 import { userSignupSchema } from '@/lib/validation';
 import { useRouter } from 'next/navigation';
-import {  googleLogin, user_signUp } from '@/lib/actions/user.action';
-
+import {  googleLogin, user_login, user_signUp , formatIndianPhoneNumber } from '@/lib/actions/user.action';
+import { emailCheckSign } from '@/lib/actions/toast.action';
+import { toast } from 'sonner';
 
 const page = () => {
   const route = useRouter()
@@ -39,11 +40,24 @@ const page = () => {
   const onSubmit = async (data: z.infer<typeof userSignupSchema>) => {
     setloading(true)
     try {
+      const checkEmail = await emailCheckSign(data.email)
+      const phone = formatIndianPhoneNumber(data.phone)
+      if(checkEmail){
+        toast.error(checkEmail)
+        const user = await user_login({email:data.email,password:data.password})
+        if(user){
+        route.push('/')
+        }
+        else{
+          route.push('/auth/user/login')
+        }
+      }
       const response = await user_signUp({
         ...data,
+        phone,
         dob: new Date(data.dob),
       })
-      console.log(response)
+      toast.success('Account created successfully')
       if(response) route.push('/')
     } catch (error) {
      console.error('ERROR',error) 
@@ -135,13 +149,13 @@ const page = () => {
               <div className="space-y-2">
                 <Label htmlFor="phone" className="flex items-center gap-2 text-sm font-medium text-black">
                   <Phone className="w-4 h-4" />
-                  Phone Number
+                  Phone Number (+91)
                 </Label>
                 <Input
                   id="phone"
                   type="tel"
                   {...register('phone')}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="Enter your phone number"
                   className="h-12 text-gray-950 placeholder:text-gray-950 border-gray-200 focus:border-black focus:ring-black"
                 />
                 {errors.phone && (

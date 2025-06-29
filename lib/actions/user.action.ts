@@ -1,6 +1,7 @@
 import { ID, Query, OAuthProvider } from "appwrite";
 import { account, avatars, databases } from "../appwrite";
 import {users} from "./user.server";
+import { parseStringify } from "../utils";
 export const user_signUp = async ({ password, ...userData }: UserSignUpParams) => {
     const { email, name , phone} = userData;
     try {
@@ -309,3 +310,58 @@ export function formatIndianPhoneNumber(phone: string): string {
   throw new Error('Invalid phone number format. Expecting 10 digits or +91XXXXXXXXXX.');
 }
 
+export const sendPhoneOTP = async(phone: string) => {
+  try {
+    const session = await account.createPhoneToken(ID.unique(), phone);
+
+    return session.userId;
+  } catch (error) {
+    console.error(error, "Failed to send email OTP");
+  }
+};
+
+export async function getUserByPhone(phone: string) {
+  try {
+    const userData = await databases.listDocuments(
+      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+      [Query.equal("phone", phone)]
+    );
+    if (userData.total == 0) return null;
+    return userData.documents[0];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function user_phoneLogin(phone: string) {
+    try {
+    const existingUser = await getUserByPhone(phone);
+
+    // User exists, send OTP
+    if (existingUser) {
+      await sendPhoneOTP(phone);
+      return parseStringify({ accountId: existingUser.accountId });
+    }
+
+    return parseStringify({ accountId: null, error: "User not found" });
+  } catch (error) {
+    console.error(error, "Failed to sign in user");
+  }
+}
+
+export const verifySecret = async ({
+  accountId,
+  password,
+}: {
+  accountId: string;
+  password: string;
+}) => {
+  try {
+    const session = await account.createSession(accountId, password);
+
+    return parseStringify({ sessionId: session.$id });
+  } catch (error) {
+    console.error(error, "Failed to verify OTP");
+  }
+};

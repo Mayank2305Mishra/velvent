@@ -22,7 +22,6 @@ export const user_loginEmailSchema = z.object({
 
 export const user_loginPhoneSchema = z.object({
     phone: z.string().min(10, 'Phone number must be at least 10 digits').regex(/^\+?[\d\s-()]+$/, 'Invalid phone number'),
-    password: z.string().min(1, 'Password is required'),
 });
 
 export type user_LoginEmailForm = z.infer<typeof user_loginEmailSchema>;

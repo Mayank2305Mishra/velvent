@@ -12,15 +12,17 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail, Phone, Lock } from 'lucide-react';
 import { FaGoogle } from 'react-icons/fa6';
-import { googleLogin, user_login } from '@/lib/actions/user.action';
+import { googleLogin, user_login, user_phoneLogin } from '@/lib/actions/user.action';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { emailCheckLogin } from '@/lib/actions/toast.action';
+import OtpModal from '@/components/velventUI/OTPModal';
 
 type LoginForm = user_LoginEmailForm | user_LoginPhoneForm;
 
 const page = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [accountId, setAccountId] = useState(null);
   const [activeTab, setActiveTab] = useState('email');
   const route = useRouter()
   const emailForm = useForm<user_LoginEmailForm>({
@@ -31,33 +33,40 @@ const page = () => {
     resolver: zodResolver(user_loginPhoneSchema),
   });
 
-  const onSubmit = async (data: user_LoginEmailForm ) => {
+  const onSubmit = async (data: user_LoginEmailForm) => {
     setIsLoading(true);
-    const {email, password} = data;
+    const { email, password } = data;
     try {
       const checkEmail = await emailCheckLogin(email)
-      if(checkEmail){
+      if (checkEmail) {
         toast.error(checkEmail)
         route.push('/auth/user/signup')
       }
-      const response = await user_login({email,password})
+      const response = await user_login({ email, password })
       console.log(response);
-      
-      if(response){
+
+      if (response) {
         toast.success(`You have logined sucessfullly with email ${email}`)
         route.push('/')
       }
-      if(!response){
-          toast.error(`Error in login with email ${email}, invalid credientials or email not registered`)
-        }
+      if (!response) {
+        toast.error(`Error in login with email ${email}, invalid credientials or email not registered`)
+      }
     } catch (error) {
       console.error('ERROR', error)
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
-  const onSubmitPhone = async(data:user_LoginPhoneForm) =>{
-    console.log(data);    
+  const onSubmitPhone = async (data: user_LoginPhoneForm) => {
+    console.log(data);
+    try {
+      const user = await user_phoneLogin(data.phone)
+      console.log(user);
+      setAccountId(user.accountId);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const handleGoogleLogin = () => {
@@ -84,8 +93,8 @@ const page = () => {
               </CardDescription>
             </div>
             {/* Google Sign In Button */}
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleGoogleLogin}
               className="w-full h-12 border-gray-200 text-velvent hover:bg-light-300 hover:text-black transition-all duration-200"
             >
@@ -173,31 +182,13 @@ const page = () => {
                       id="phone"
                       type="tel"
                       {...phoneForm.register('phone')}
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="Enter your phone number"
                       className="h-12 text-gray-950 placeholder:text-gray-950 border-gray-200 focus:border-black focus:ring-black"
                     />
                     {phoneForm.formState.errors.phone && (
                       <p className="text-sm text-red-600">{phoneForm.formState.errors.phone.message}</p>
                     )}
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone-password" className="flex items-center gap-2 text-sm font-medium text-black">
-                      <Lock className="w-4 h-4" />
-                      Password
-                    </Label>
-                    <Input
-                      id="phone-password"
-                      type="password"
-                      {...phoneForm.register('password')}
-                      placeholder="Enter your password"
-                      className="h-12 text-gray-950 placeholder:text-gray-950 border-gray-200 focus:border-black focus:ring-black"
-                    />
-                    {phoneForm.formState.errors.password && (
-                      <p className="text-sm text-red-600">{phoneForm.formState.errors.password.message}</p>
-                    )}
-                  </div>
-
                   <div className="flex items-center justify-between">
                     <Link href="/auth/forgot-password" className="text-sm text-velvent hover:text-black">
                       Forgot password?
@@ -224,6 +215,9 @@ const page = () => {
             </Link>
           </p>
         </div>
+        {accountId && (
+          <OtpModal phone={phoneForm.getValues("phone")} accountId={accountId} />
+        )}
         <br />
         <br />
       </div>

@@ -11,7 +11,7 @@ export const INITIAL_USER = {
     email: "",
     phone:"",
     dob: new Date(),
-    gender:"",
+    gender:"Male",
     avatar:"https://api.dicebear.com/6.x/micah/png?seed=MM&backgroundColor=b6e3f4,c0aede,d1d4f9",
     bio:"",
     bannerImg:"https://i.ibb.co/PG6mX543/3ca8bc3b8c77f6bac9ea67398058397ac3633b3e.jpg"

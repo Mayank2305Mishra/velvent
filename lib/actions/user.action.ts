@@ -141,70 +141,6 @@ async function getUserDOBGoogle(accessToken: string): Promise<string | null> {
     return null;
   }
 }
-async function getUserPhoneNumberGoogle(accessToken: string): Promise<string | null> {
-  // Change personFields to 'phoneNumbers' to request phone number information
-  const apiUrl = 'https://people.googleapis.com/v1/people/me?personFields=phoneNumbers';
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Accept': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      // Handle HTTP errors (e.g., 401 Unauthorized, 403 Forbidden, 404 Not Found)
-      const errorData = await response.json();
-      console.error(`Error fetching phone number: ${response.status} - ${errorData.error.message}`);
-      return null;
-    }
-
-    const data = await response.json();
-
-    // The phone numbers are typically an array. We look for the primary one.
-    // Google People API response structure for phone numbers:
-    // {
-    //   "resourceName": "people/...",
-    //   "etag": "...",
-    //   "phoneNumbers": [
-    //     {
-    //       "value": "+11234567890",
-    //       "type": "mobile",
-    //       "formattedType": "Mobile",
-    //       "metadata": {
-    //         "primary": true,
-    //         "source": {
-    //           "type": "PROFILE",
-    //           "id": "..."
-    //         }
-    //       }
-    //     },
-    //     {
-    //       "value": "+19876543210",
-    //       "type": "home",
-    //       "formattedType": "Home"
-    //     }
-    //   ]
-    // }
-    if (data.phoneNumbers && Array.isArray(data.phoneNumbers) && data.phoneNumbers.length > 0) {
-      // Find the primary phone number if available, otherwise just take the first one
-      const primaryPhoneNumber = data.phoneNumbers.find((phone: any) => phone.metadata?.primary);
-      if (primaryPhoneNumber) {
-        return primaryPhoneNumber.value;
-      } else {
-        // If no primary, return the first one found
-        return data.phoneNumbers[0].value;
-      }
-    } else {
-      console.log('No phone numbers found for this user.');
-      return null;
-    }
-  } catch (error) {
-    console.error('Network or unexpected error:', error);
-    return null;
-  }
-}
 export async function googleLogin() {
     try {
         //const userData = await account.createOAuth2Token(OAuthProvider.Google);
@@ -237,9 +173,6 @@ export async function storeGoogleUser(email: string) {
             const dob = providerAccessToken 
                     ? await getUserDOBGoogle(providerAccessToken) 
                     : Date.now();
-            const phone = providerAccessToken
-                    ? await getUserPhoneNumberGoogle(providerAccessToken)
-                    : null;
             const today: Date = new Date();
             const newUser = await databases.createDocument(
                 process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
@@ -251,7 +184,6 @@ export async function storeGoogleUser(email: string) {
                     avatar: profilePicture,
                     name: user.name,
                     dob: dob,
-                    phone: phone,
                     dateOfJoin: today,
                     MethodOFAuth: "Google"
                 }

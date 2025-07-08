@@ -2,6 +2,8 @@ import { ID, Query, OAuthProvider } from "appwrite";
 import { account, avatars, databases } from "../appwrite";
 import {users} from "./user.server";
 import { parseStringify } from "../utils";
+
+//USER REGISTRATION WITH THE DATABASE
 export const user_signUp = async ({ password, ...userData }: UserSignUpParams) => {
     const { email, name , phone} = userData;
     try {
@@ -9,7 +11,6 @@ export const user_signUp = async ({ password, ...userData }: UserSignUpParams) =
         if (!user) throw new Error("User not created");
         const avatar = await avatars.getInitials(name, 100, 100, "DFD3E3");
         await user_login({ email, password })
-        const today: Date = new Date();
         const newUser = await databases.createDocument(
             process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
             process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
@@ -18,8 +19,8 @@ export const user_signUp = async ({ password, ...userData }: UserSignUpParams) =
                 ...userData,
                 userId: user.$id,
                 avatar,
-                dateOfJoin : today,
-                MethodOFAuth : "EP"
+                createdAt : user.$createdAt,
+                authMethod : 'email'
             }
         )
         return newUser;
@@ -30,6 +31,51 @@ export const user_signUp = async ({ password, ...userData }: UserSignUpParams) =
     }
 }
 
+export async function storeGoogleUser(email: string) {
+    try {
+        const userData = await databases.listDocuments(
+            process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+            process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+            [Query.equal("email", email)]
+        );
+        if (userData.total == 0) {
+            const user = await getAccount()
+            if(!user) throw Error("User not found");
+            const { providerAccessToken } = (await account.getSession("current")) || {};
+            const profilePicture = providerAccessToken
+                ? await getGooglePicture(providerAccessToken)
+                : null;
+            const dob = providerAccessToken 
+                    ? await getUserDOBGoogle(providerAccessToken) 
+                    : Date.now();
+
+            const gender = providerAccessToken 
+                    ? await getUserGenderGoogle(providerAccessToken)
+                    : "Others";
+            const newUser = await databases.createDocument(
+                process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+                process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+                ID.unique(),
+                {
+                    email: user.email,
+                    userId: user.$id,
+                    avatar: profilePicture,
+                    name: user.name,
+                    dob: dob,
+                    //gender: gender,
+                    createdAt: user.$createdAt,
+                    authMethod: "google"
+                }
+            )
+            return newUser;
+        }
+    } catch (err) {
+        console.error('Signup Error:', err);
+        throw err;
+    }
+}
+
+//USER LOGIN 
 export const user_login = async ({ email, password }: UserLoginParams) => {
     try {
         const user = await account.createEmailPasswordSession(email, password);
@@ -40,15 +86,23 @@ export const user_login = async ({ email, password }: UserLoginParams) => {
     }
 }
 
-export async function getAccount() {
+export async function googleLogin() {
     try {
-        const currentAccount = await account.get()
-        return currentAccount;
+        //const userData = await account.createOAuth2Token(OAuthProvider.Google);
+        localStorage.setItem("googleAuth", "true");
+        const user = await account.createOAuth2Session(
+            OAuthProvider.Google,
+            `${window.location.origin}/profile`,
+            `${window.location.origin}/login`,
+            ["https://www.googleapis.com/auth/user.birthday.read", "https://www.googleapis.com/auth/user.phonenumbers.read","https://www.googleapis.com/auth/userinfo.email","https://www.googleapis.com/auth/userinfo.profile","https://www.googleapis.com/auth/user.birthday.read","https://www.googleapis.com/auth/user.gender.read"],
+        )
+        return user;
     } catch (error) {
         console.error(error);
     }
 }
 
+//GOOGLE PEOPLES API FUNCTIONS 
 const getGooglePicture = async (accessToken: string) => {
     try {
         const response = await fetch(
@@ -141,58 +195,50 @@ async function getUserDOBGoogle(accessToken: string): Promise<string | null> {
     return null;
   }
 }
-export async function googleLogin() {
-    try {
-        //const userData = await account.createOAuth2Token(OAuthProvider.Google);
-        const user = await account.createOAuth2Session(
-            OAuthProvider.Google,
-            `${window.location.origin}/profile/edit`,
-            `${window.location.origin}/login`,
-            ["https://www.googleapis.com/auth/user.birthday.read", "https://www.googleapis.com/auth/user.phonenumbers.read","https://www.googleapis.com/auth/userinfo.email","https://www.googleapis.com/auth/userinfo.profile"],
-        )
-        return user;
-    } catch (error) {
-        console.error(error);
+
+async function getUserGenderGoogle(accessToken: string): Promise<string | null> {
+  const apiUrl = 'https://people.googleapis.com/v1/people/me?personFields=genders';
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      // Handle HTTP errors (e.g., 401 Unauthorized, 403 Forbidden, 404 Not Found)
+      const errorData = await response.json();
+      console.error(`Error fetching gender: ${response.status} - ${errorData.error.message}`);
+      return null;
     }
+    const data = await response.json();
+    if (data.genders && Array.isArray(data.genders) && data.genders.length > 0) {
+      // Find the primary gender if available, otherwise just take the first one
+      const primaryGender = data.genders.find((gender: any) => gender.metadata?.primary);
+      const genderValue = primaryGender ? primaryGender.value : data.genders[0].value;
+
+      return genderValue;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching gender:', error);
+    return null;
+  }
 }
 
-export async function storeGoogleUser(email: string) {
+
+//APPWRITE ACCOUNT RETIVAL
+
+export async function getAccount() {
     try {
-        const userData = await databases.listDocuments(
-            process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-            process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
-            [Query.equal("email", email)]
-        );
-        if (userData.total == 0) {
-            const user = await getAccount()
-            if(!user) throw Error("User not found");
-            const { providerAccessToken } = (await account.getSession("current")) || {};
-            const profilePicture = providerAccessToken
-                ? await getGooglePicture(providerAccessToken)
-                : null;
-            const dob = providerAccessToken 
-                    ? await getUserDOBGoogle(providerAccessToken) 
-                    : Date.now();
-            const today: Date = new Date();
-            const newUser = await databases.createDocument(
-                process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-                process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
-                ID.unique(),
-                {
-                    email: user.email,
-                    userId: user.$id,
-                    avatar: profilePicture,
-                    name: user.name,
-                    dob: dob,
-                    dateOfJoin: today,
-                    MethodOFAuth: "Google"
-                }
-            )
-            return newUser;
-        }
-    } catch (err) {
-        console.error('Signup Error:', err);
-        throw err;
+        const currentAccount = await account.get()
+        return currentAccount;
+    } catch (error) {
+        console.error(error);
     }
 }
 
@@ -215,15 +261,21 @@ export async function getCurrentAccount() {
     }
 }
 
-export async function signOut() {
-    try {
-        const session = await account.deleteSession("current")
-        return session;
-    } catch (error) {
-        console.error(error);
-    }
-}
 
+//USER PHONE AUTH (OTP + VERIFICATION)
+export async function getUserByPhone(phone: string) {
+  try {
+    const userData = await databases.listDocuments(
+      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+      [Query.equal("phone", phone)]
+    );
+    if (userData.total == 0) return null;
+    return userData.documents[0];
+  } catch (error) {
+    console.error(error);
+  }
+}
 export function formatIndianPhoneNumber(phone: string): string {
   // Remove all whitespace for safety
   const cleaned = phone.trim().replace(/\s+/g, '');
@@ -252,19 +304,6 @@ export const sendPhoneOTP = async(phone: string) => {
   }
 };
 
-export async function getUserByPhone(phone: string) {
-  try {
-    const userData = await databases.listDocuments(
-      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
-      [Query.equal("phone", phone)]
-    );
-    if (userData.total == 0) return null;
-    return userData.documents[0];
-  } catch (error) {
-    console.error(error);
-  }
-}
 
 export async function user_phoneLogin(phone: string) {
     try {
@@ -297,3 +336,14 @@ export const verifySecret = async ({
     console.error(error, "Failed to verify OTP");
   }
 };
+
+//SIGN OUT FUNCTION 
+export async function signOut() {
+    try {
+        const session = await account.deleteSession("current")
+        return session;
+    } catch (error) {
+        console.error(error);
+    }
+}
+

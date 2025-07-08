@@ -34,4 +34,6 @@ declare type User = {
     avatar: string;
     bio: string;
     phone: string;
+    favorites: string[];
+    role: string;
 }

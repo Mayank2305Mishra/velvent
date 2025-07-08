@@ -33,11 +33,16 @@ export const user_profileSchema = z.object({
     gender: z.enum(['Male', 'Female', 'Others'], {
         required_error: 'Please select a gender',
     }),
+    avatar: z.string(),
+    bannerImg: z.string(),
 })
 
+export type ProfileFormData = z.infer<typeof user_profileSchema>;
 
 export type user_LoginEmailForm = z.infer<typeof user_loginEmailSchema>;
 export type user_LoginPhoneForm = z.infer<typeof user_loginPhoneSchema>;
+
+//export type ProfileFormData = z.infer<typeof user_profileSchema>;
 
 export const genderOptions = [
   { value: "Male", label: "Male" },

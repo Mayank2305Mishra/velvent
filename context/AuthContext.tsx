@@ -1,7 +1,7 @@
 'use client'
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAccount, getCurrentAccount, storeGoogleUser } from "@/lib/actions/user.action";
+import {  getCurrentAccount } from "@/lib/actions/user.action";
 
 
 export const INITIAL_USER = {
@@ -14,6 +14,8 @@ export const INITIAL_USER = {
     avatar: "https://api.dicebear.com/6.x/micah/png?seed=MM&backgroundColor=b6e3f4,c0aede,d1d4f9",
     bio: "",
     bannerImg: "https://i.ibb.co/PG6mX543/3ca8bc3b8c77f6bac9ea67398058397ac3633b3e.jpg",
+    favorites: [''],
+    role: "user"
 }
 
 export const INITIAL_STATE = {
@@ -56,6 +58,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     avatar: currentAccount.avatar,
                     bio: currentAccount.bio,
                     phone: currentAccount.phone,
+                    favorites: currentAccount.favorites,
+                    role: currentAccount.role
                 })
                 setIsAuthenticated(true)
                 return true
@@ -68,6 +72,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setIsLoading(false)
         }
     }
+    useEffect(() => {
+        checkAuthUser();
+        const cookieFallback = localStorage.getItem("cookieFallback");
+        const googleAuth = localStorage.getItem("googleAuth");
+        console.log({ cookieFallback, googleAuth });
+        if(googleAuth == "true"){
+            if(cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) { 
+                console.log("cookieFallback", cookieFallback);
+                setTimeout(() => {
+                    route.push("/new");
+                }, 6000);
+             }
+        }
+        if(googleAuth !== "true"){
+            if (googleAuth !== "true" && cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) { route.push("/new"); }
+        }
+    }, [])
+
     const values = {
         user,
         setUser,

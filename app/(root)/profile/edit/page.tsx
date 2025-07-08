@@ -1,467 +1,363 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Camera, Save, Mail, Phone, Calendar, Users, FileText, Upload, Crop, Loader2, User } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { user_profileSchema, formFieldConfig } from "@/lib/validation";
-import { useAuthStore } from "@/app/store";
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
+import { CalendarIcon, Camera, Save, User, Mail, Phone, Calendar, Users, FileText, Image as ImageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { user_profileSchema, type ProfileFormData } from '@/lib/validation';
+import { ImageCropper } from '@/components/velventUI/image-cropper';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/app/store';
 
-type ProfileFormData = z.infer<typeof user_profileSchema>;
 
-export default function EditProfilePage() {
-  const { user } = useAuthStore();
-  const [userData, setUserData] = useState<User | null>(null);
-  const [profileImage, setProfileImage] = useState<string>("");
-  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [cropPreview, setCropPreview] = useState<string>("");
+export default function ProfileEditPage() {
+  const { user, updateUserField } = useAuthStore();
+  const [isAvatarCropperOpen, setIsAvatarCropperOpen] = useState(false);
+  const [isBannerCropperOpen, setIsBannerCropperOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDataLoading, setIsDataLoading] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(user_profileSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      dob: new Date(),
-      gender: "Male",
-      bio: "",
+      phone: user.phone,
+      dob: user.dob instanceof Date ? user.dob : new Date(user.dob),
+      gender: (user.gender == "Male" || user.gender == "Female" || user.gender == "Others") ? user.gender : "Male",
+      bio: user.bio,
+      avatar: user.avatar,
+      bannerImg: user.bannerImg,
     },
   });
 
-  // Load user data on component mount
   useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        setIsDataLoading(true);
-        const { user } = useAuthStore()
-        setUserData(user);
-        setProfileImage(user.avatar);
-        let gender = "Others";
-
-        // Update form with loaded data
-        form.reset({
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          dob: user.dob,
-          gender: (user.gender === "Male" || user.gender === "Female" || user.gender === "Others") ? user.gender : "Others",
-          bio: user.bio,
-        });
-      } catch (error) {
-        console.error("Failed to load user data:", error);
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
-
-    loadUserData();
-  }, [form]);
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setCropPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleCropAndSave = useCallback(() => {
-    if (!cropPreview) return;
-
-    const canvas = canvasRef.current;
-    const image = imageRef.current;
-
-    if (canvas && image) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        const size = 200;
-        canvas.width = size;
-        canvas.height = size;
-
-        // Draw circular crop
-        ctx.beginPath();
-        ctx.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
-        ctx.clip();
-
-        // Calculate dimensions to maintain aspect ratio
-        const aspectRatio = image.naturalWidth / image.naturalHeight;
-        let drawWidth = size;
-        let drawHeight = size;
-        let offsetX = 0;
-        let offsetY = 0;
-
-        if (aspectRatio > 1) {
-          drawHeight = size / aspectRatio;
-          offsetY = (size - drawHeight) / 2;
-        } else {
-          drawWidth = size * aspectRatio;
-          offsetX = (size - drawWidth) / 2;
-        }
-
-        ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
-
-        const croppedImageUrl = canvas.toDataURL("image/jpeg", 0.9);
-        setProfileImage(croppedImageUrl);
-        setIsImageDialogOpen(false);
-        setCropPreview("");
-        setSelectedFile(null);
-      }
-    }
-  }, [cropPreview]);
+    form.reset({
+      phone: user.phone,
+      dob: user.dob,
+      gender: (user.gender == "Male" || user.gender == "Female" || user.gender == "Others") ? user.gender : "Male",
+      bio: user.bio,
+      avatar: user.avatar,
+      bannerImg: user.bannerImg,
+    });
+  }, [user, form]);
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!userData) return;
-
     setIsLoading(true);
+    console.log(data);
     try {
-      console.log(data);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Update user data in store
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined) {
+          updateUserField(key as keyof typeof data, value);
+        }
+      });
+      toast.success('Profile updated successfully!');
     } catch (error) {
-      console.error("Failed to update profile:", error);
+      toast.error('Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map(word => word.charAt(0))
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  const handleAvatarCrop = (croppedImageUrl: string) => {
+    updateUserField('avatar', croppedImageUrl);
+    form.setValue('avatar', croppedImageUrl);
   };
 
-  if (isDataLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin text-slate-600" />
-          <p className="text-slate-600">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!userData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-slate-600">Failed to load profile data</p>
-          <Button
-            onClick={() => window.location.reload()}
-            className="mt-4"
-            variant="outline"
-          >
-            Retry
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const handleBannerCrop = (croppedImageUrl: string) => {
+    updateUserField('bannerImg', croppedImageUrl);
+    form.setValue('bannerImg', croppedImageUrl);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Edit Profile</h1>
-          <p className="text-slate-600">Update your personal information and preferences</p>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+            Edit Profile
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400">
+            Update your personal information and preferences
+          </p>
         </div>
 
-        <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm">
-          <CardHeader className="pb-6">
-            <CardTitle className="text-xl font-semibold text-slate-900">Personal Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {/* Profile Image Section */}
-              <div className="flex flex-col items-center space-y-4">
-                <div className="relative group">
-                  <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
-                    <AvatarImage src={profileImage} alt="Profile" />
-                    <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-blue-400 to-purple-500 text-white">
-                      {getInitials(userData.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        type="button"
-                        size="sm"
-                        className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-                      >
-                        <Camera className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Update Profile Picture</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handleFileSelect}
-                          accept="image/*"
-                          className="hidden"
-                        />
-
-                        {!cropPreview ? (
-                          <Button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full h-12 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-                          >
-                            <Upload className="mr-2 h-4 w-4" />
-                            Choose Image
-                          </Button>
-                        ) : (
-                          <div className="space-y-4">
-                            <div className="flex justify-center">
-                              <div className="relative">
-                                <img
-                                  ref={imageRef}
-                                  src={cropPreview}
-                                  alt="Preview"
-                                  className="max-w-full h-48 object-contain rounded-lg"
-                                />
-                                <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg pointer-events-none"></div>
-                              </div>
-                            </div>
-                            <canvas ref={canvasRef} className="hidden" />
-                            <div className="flex space-x-2">
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                  setCropPreview("");
-                                  setSelectedFile(null);
-                                }}
-                                className="flex-1"
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                type="button"
-                                onClick={handleCropAndSave}
-                                className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-                              >
-                                <Crop className="mr-2 h-4 w-4" />
-                                Apply
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+        {/* Profile Preview Card */}
+        <Card className="mb-8 overflow-hidden border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+          <div className="relative">
+            {/* Banner Image */}
+            <div 
+              className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 relative group cursor-pointer"
+              style={{
+                backgroundImage: user.bannerImg ? `url(${user.bannerImg})` : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+              onClick={() => setIsBannerCropperOpen(true)}
+            >
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-200" />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="bg-white/90 dark:bg-slate-800/90 rounded-full p-3">
+                  <Camera className="h-6 w-6 text-slate-700 dark:text-slate-300" />
                 </div>
-                <p className="text-sm text-slate-500 text-center">
-                  Click the camera icon to update your profile picture
+              </div>
+              <Badge 
+                variant="secondary" 
+                className="absolute top-4 right-4 bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300"
+              >
+                <ImageIcon className="h-3 w-3 mr-1" />
+                Change Banner
+              </Badge>
+            </div>
+
+            {/* Profile Avatar */}
+            <div className="absolute -bottom-16 left-8">
+              <div className="relative group cursor-pointer" onClick={() => setIsAvatarCropperOpen(true)}>
+                <Avatar className="h-32 w-32 border-4 border-white dark:border-slate-800 shadow-xl">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                    {user.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                  <Camera className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <CardContent className="pt-20 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  {user.name}
+                </h2>
+                <p className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  {user.email}
                 </p>
               </div>
+              <Badge variant="outline" className="w-fit">
+                <User className="h-3 w-3 mr-1" />
+                {user.gender}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
 
-              <Separator />
-
-              {/* Form Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Name Field (Non-editable) */}
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="flex items-center text-sm font-medium text-slate-700">
-                    <User className="mr-2 h-4 w-4" />
-                    {formFieldConfig.name.label}
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="name"
-                      {...form.register("name")}
-                      disabled={!formFieldConfig.name.editable}
-                      className="bg-slate-50 text-slate-500 cursor-not-allowed"
+        {/* Edit Form */}
+        <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
+              <FileText className="h-5 w-5" />
+              Personal Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Non-editable fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Full Name
+                    </Label>
+                    <Input 
+                      value={user.name} 
+                      disabled 
+                      className="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400" 
                     />
-                    {!formFieldConfig.name.editable && (
-                      <Badge variant="secondary" className="absolute -top-2 -right-2 text-xs bg-slate-200">
-                        Read-only
-                      </Badge>
-                    )}
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Name cannot be changed</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <Mail className="h-4 w-4" />
+                      Email Address
+                    </Label>
+                    <Input 
+                      value={user.email} 
+                      disabled 
+                      className="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400" 
+                    />
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Email cannot be changed</p>
                   </div>
                 </div>
 
-                {/* Email Field (Non-editable) */}
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center text-sm font-medium text-slate-700">
-                    <Mail className="mr-2 h-4 w-4" />
-                    {formFieldConfig.email.label}
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="email"
-                      {...form.register("email")}
-                      disabled={!formFieldConfig.email.editable}
-                      className="bg-slate-50 text-slate-500 cursor-not-allowed"
-                    />
-                    {!formFieldConfig.email.editable && (
-                      <Badge variant="secondary" className="absolute -top-2 -right-2 text-xs bg-slate-200">
-                        Read-only
-                      </Badge>
-                    )}
-                  </div>
-                </div>
+                <Separator className="my-6" />
 
-                {/* Phone Field (Editable) */}
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="flex items-center text-sm font-medium text-slate-700">
-                    <Phone className="mr-2 h-4 w-4" />
-                    {formFieldConfig.phone.label}
-                  </Label>
-                  <Input
-                    id="phone"
-                    {...form.register("phone")}
-                    className={cn(
-                      "transition-colors",
-                      form.formState.errors.phone ? "border-red-500 focus:border-red-500" : ""
+                {/* Editable fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Phone className="h-4 w-4" />
+                          Phone Number
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter your phone number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                  {form.formState.errors.phone && (
-                    <p className="text-sm text-red-600">{form.formState.errors.phone.message}</p>
-                  )}
-                </div>
 
-                {/* Date of Birth Field */}
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth" className="flex items-center text-sm font-medium text-slate-700">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {formFieldConfig.dob.label}
-                  </Label>
-                  <Input
-                    id="dateOfBirth"
-                    type="date"
-                    {...form.register("dob")}
-                    className={cn(
-                      "transition-colors",
-                      form.formState.errors.dob ? "border-red-500 focus:border-red-500" : ""
+                  <FormField
+                    control={form.control}
+                    name="gender"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          Gender
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select your gender" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Male">Male</SelectItem>
+                            <SelectItem value="Female">Female</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                  {form.formState.errors.dob && (
-                    <p className="text-sm text-red-600">{form.formState.errors.dob.message}</p>
-                  )}
                 </div>
 
-                {/* Gender Field */}
-                <div className="space-y-2 md:col-span-2">
-                  <Label className="flex items-center text-sm font-medium text-slate-700">
-                    <Users className="mr-2 h-4 w-4" />
-                    {formFieldConfig.gender.label}
-                  </Label>
-                  <Select
-                    value={form.watch("gender")}
-                    onValueChange={(value) => {
-                      switch (value) {
-                        case "Male":
-                        case "Female":
-                        case "Others":
-                          form.setValue("gender", value);
-                          break;
-                        default:
-                          form.setValue("gender", "Others");
-                      }
-                    }}
-                  >
-                    <SelectTrigger className={cn(
-                      "transition-colors",
-                      form.formState.errors.gender ? "border-red-500 focus:border-red-500" : ""
-                    )}>
-                      <SelectValue placeholder="Select your gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {formFieldConfig.gender.options.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {form.formState.errors.gender && (
-                    <p className="text-sm text-red-600">{form.formState.errors.gender.message}</p>
+                <FormField
+                  control={form.control}
+                  name="dob"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Date of Birth
+                      </FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-              </div>
-
-              {/* Bio Field */}
-              <div className="space-y-2">
-                <Label htmlFor="bio" className="flex items-center text-sm font-medium text-slate-700">
-                  <FileText className="mr-2 h-4 w-4" />
-                  {formFieldConfig.bio.label}
-                </Label>
-                <Textarea
-                  id="bio"
-                  {...form.register("bio")}
-                  rows={formFieldConfig.bio.rows}
-                  className={cn(
-                    "resize-none transition-colors",
-                    form.formState.errors.bio ? "border-red-500 focus:border-red-500" : ""
-                  )}
-                  placeholder="Tell us a bit about yourself..."
                 />
-                <div className="flex justify-between items-center">
-                  {form.formState.errors.bio ? (
-                    <p className="text-sm text-red-600">{form.formState.errors.bio.message}</p>
-                  ) : (
-                    <div />
+
+                <FormField
+                  control={form.control}
+                  name="bio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Bio
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Tell us about yourself..."
+                          className="min-h-[100px] resize-none"
+                          {...field}
+                        />
+                      </FormControl>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {field.value?.length || 0}/500 characters
+                      </p>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                  <p className="text-xs text-slate-500">
-                    {form.watch("bio")?.length || 0}/{formFieldConfig.bio.maxLength} characters
-                  </p>
+                />
+
+                <div className="flex justify-end pt-6">
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8"
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
                 </div>
-              </div>
-
-              <Separator />
-
-              {/* Submit Button */}
-              <div className="flex justify-end">
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="px-8 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:opacity-50"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                      Saving Changes...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       </div>
+
+      {/* Image Croppers */}
+      <ImageCropper
+        isOpen={isAvatarCropperOpen}
+        onClose={() => setIsAvatarCropperOpen(false)}
+        onCropComplete={handleAvatarCrop}
+        aspectRatio={1}
+        title="Crop Profile Picture"
+      />
+
+      <ImageCropper
+        isOpen={isBannerCropperOpen}
+        onClose={() => setIsBannerCropperOpen(false)}
+        onCropComplete={handleBannerCrop}
+        aspectRatio={16 / 9}
+        title="Crop Banner Image"
+      />
     </div>
   );
 }

@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 route.push("/new")
             }, 7000)
         }
-        if(auth === null || auth === undefined && googleAuth === "true"){
+        if(auth === null || auth === undefined && googleAuth !== "true"){
             route.push("/new")
         }
     }, [])

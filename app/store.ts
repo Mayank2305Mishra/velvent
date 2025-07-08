@@ -47,6 +47,7 @@ export const useAuthStore = create<AuthStore>()(
                 set(() => ({ isAuthenticated: bool })),
             setUser: (user: User) =>
                 set(() => ({ user: { ...get().user, ...user } })),
+
             checkAuthUser: async () => {
                 try {
                     const currentAccount = await getCurrentAccount();

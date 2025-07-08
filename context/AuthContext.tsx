@@ -1,7 +1,7 @@
 'use client'
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {  getCurrentAccount } from "@/lib/actions/user.action";
+import { getCurrentAccount } from "@/lib/actions/user.action";
 
 
 export const INITIAL_USER = {
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(true)
         try {
             const currentAccount = await getCurrentAccount()
-            
+
             if (currentAccount) {
                 setUser({
                     userId: currentAccount.accountId,
@@ -77,14 +77,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         //const cookieFallback = localStorage.getItem("cookieFallback");
         const googleAuth = localStorage.getItem("googleAuth");
         const auth = localStorage.getItem("auth");
-        console.log(auth, googleAuth);
-        if(auth === null || auth === undefined && googleAuth === "true") {
-            setTimeout(() => {
-                route.push("/new")
-            }, 7000)
-        }
-        if(auth === null || auth === undefined && googleAuth !== "true"){
+        if(googleAuth !== 'true'){
+         if (auth === null || auth === undefined) {
             route.push("/new")
+        }   
         }
     }, [])
 

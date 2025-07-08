@@ -74,19 +74,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     useEffect(() => {
         checkAuthUser();
-        const cookieFallback = localStorage.getItem("cookieFallback");
+        //const cookieFallback = localStorage.getItem("cookieFallback");
         const googleAuth = localStorage.getItem("googleAuth");
-        console.log({ cookieFallback, googleAuth });
-        if(googleAuth == "true"){
-            if(cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) { 
-                console.log("cookieFallback", cookieFallback);
-                setTimeout(() => {
-                    route.push("/new");
-                }, 6000);
-             }
+        const auth = localStorage.getItem("auth");
+        console.log(auth, googleAuth);
+        if(auth === null || auth === undefined && googleAuth === "true") {
+            setTimeout(() => {
+                route.push("/new")
+            }, 7000)
         }
-        if(googleAuth !== "true"){
-            if (googleAuth !== "true" && cookieFallback === "[]" || cookieFallback === null || cookieFallback === undefined) { route.push("/new"); }
+        if(auth === null || auth === undefined && googleAuth === "true"){
+            route.push("/new")
         }
     }, [])
 

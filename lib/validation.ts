@@ -5,8 +5,7 @@ export const userSignupSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z
         .string()
-        .min(8, 'Password must be at least 8 characters')
-        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain uppercase, lowercase and number'),
+        .min(8, 'Password must be at least 8 characters'),
     phone: z.string().min(10, 'Phone number must be at least 10 digits').regex(/^\+?[\d\s-()]+$/, 'Invalid phone number'),
     bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
     dob: z.string().min(1, 'Date of birth is required'),
